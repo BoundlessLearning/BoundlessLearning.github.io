@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>咸鱼成长小站</title>
+  
+  <subtitle>记录摸鱼生活</subtitle>
+  <link href="https://www.boundlesslearn.com/atom.xml" rel="self"/>
+  
+  <link href="https://www.boundlesslearn.com/"/>
+  <updated>2023-06-25T15:22:10.179Z</updated>
+  <id>https://www.boundlesslearn.com/</id>
+  
+  <author>
+    <name>Andy</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>让WSL和Windows共享SSH私钥</title>
+    <link href="https://www.boundlesslearn.com/posts/348542353/"/>
+    <id>https://www.boundlesslearn.com/posts/348542353/</id>
+    <published>2023-06-25T13:26:15.000Z</published>
+    <updated>2023-06-25T15:22:10.179Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天在VSCode上连接WSL写代码时，发现我没有为WSL配置SSH私钥。但是同一台电脑不想生成两份key。所以打算共享Windows上的私钥到linux下。</p><p>本文将介绍如何共享Windows上的私钥到WSL，并设置正确的权限。</p><h2 id="建立软连接"><a href="#建立软连接" class="headerlink" title="建立软连接"></a>建立软连接</h2><p>首先，我们需要在WSL中创建一个软连接，将Windows上的.ssh文件夹链接到WSL中。在WSL终端中输入以下命令：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd ~</span><br><span class="line">ln -s /mnt/c/Users/your name/.ssh .</span><br></pre></td></tr></table></figure><p>需要注意的是，创建软连接前需要保证~目录下不存在.ssh文件夹。可以先<code>rm -rf .ssh</code>将该文件夹删除。</p><p>如果.ssh文件夹里有需要的文件不可以删除，可以考虑在.ssh文件夹里单独对Windows下的某个key创建软连接。</p><h2 id="设置权限"><a href="#设置权限" class="headerlink" title="设置权限"></a>设置权限</h2><p>设置完软连接，此时我们直接使用ssh会提示:</p><p><code>Permissions 0777 for &#39;/home/your name/.ssh/id_rsa&#39; are too open.</code></p><p>这是因为SSH私钥的权限太高，需要修改.</p><p>我们可以使用chmod命令修改文件权限，但是在WSL中，访问挂载的Windows文件时，权限是根据Windows权限计算的或者通过元数据读取。</p><p>默认情况下，元数据未启用，因此使用chmod命令修改权限时只能同时去除或添加写的权限，类似于在Windows中将文件修改为只读。</p><p>详情可以参考微软关于<a href="https://learn.microsoft.com/zh-cn/windows/wsl/file-permissions">WSL的文件权限</a>的文档说明。</p><p>为了自定义权限，我们需要启用元数据这个功能。在WSL终端中使用以下命令打开wsl的配置文件：</p><p>在WSL终端中使用以下命令打开wsl的配置文件</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/wsl.conf</span><br></pre></td></tr></table></figure><p>在里面添加如下内容：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[automount]</span><br><span class="line">options = &quot;metadata&quot;</span><br></pre></td></tr></table></figure><p>保存后在Windows控制台中重启WSL</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wsl -t ubuntu       //ubuntu为你的WSL分发名</span><br><span class="line">wsl</span><br></pre></td></tr></table></figure><p>再次cd到<code>~/.ssh</code>目录，使用chmod修改权限</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod 600 id_rsa</span><br></pre></td></tr></table></figure><p>可以通过ls命令确认权限修改成功。</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -l</span><br></pre></td></tr></table></figure><h2 id="使用SSH"><a href="#使用SSH" class="headerlink" title="使用SSH"></a>使用SSH</h2><p>现在，你已经成功地将Windows上的SSH私钥共享到WSL中，并设置了正确的权限。你可以使用SSH来连接远程服务器，上传代码等等。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;今天在VSCode上连接WSL写代码时，发现我没有为WSL配置SSH私钥。但是同一台电脑不想生成两份key。所以打算共享Windows上的私</summary>
+      
+    
+    
+    
+    <category term="其它" scheme="https://www.boundlesslearn.com/categories/%E5%85%B6%E5%AE%83/"/>
+    
+    
+    <category term="Linux" scheme="https://www.boundlesslearn.com/tags/Linux/"/>
+    
+    <category term="其它" scheme="https://www.boundlesslearn.com/tags/%E5%85%B6%E5%AE%83/"/>
+    
+    <category term="SSH" scheme="https://www.boundlesslearn.com/tags/SSH/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>解决配置代理后sudo仍无法正常使用代理的问题</title>
+    <link href="https://www.boundlesslearn.com/posts/876839731/"/>
+    <id>https://www.boundlesslearn.com/posts/876839731/</id>
+    <published>2023-06-22T07:13:10.000Z</published>
+    <updated>2023-06-25T15:22:10.179Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今日在WSL中安装Ros2的时候发现使用下面命令添加ROS2 GPG key的时候下载失败。</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg</span><br></pre></td></tr></table></figure><p>终端提示<code>curl: (6) Could not resolve host: raw.githubusercontent.com</code></p><p>于是我想到为WSL配置代理</p><h2 id="为WSL添加代理"><a href="#为WSL添加代理" class="headerlink" title="为WSL添加代理"></a>为WSL添加代理</h2><p>在主机打开代理软件后，在WSL终端中输入以下命令</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export all_proxy=&quot;socks5://172.29.80.1:10808&quot;</span><br></pre></td></tr></table></figure><p>再次尝试使用curl下载key发现依然失败。同时，我发现直接<code>curl www.google.com</code>是有正常的输出的，说明代理是正常配置的。</p><p>思索并查了一下资料，了解到通过<code>export</code>添加的环境变量只对当前用户生效，对于sudo指令,sudo执行时会重置环境变量</p><h2 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h2><p>知道原因后就简单了，下面列举两种解决办法</p><h4 id="1-利用sudo-E-使用当前的环境变量执行命令"><a href="#1-利用sudo-E-使用当前的环境变量执行命令" class="headerlink" title="1. 利用sudo -E 使用当前的环境变量执行命令"></a>1. 利用sudo -E 使用当前的环境变量执行命令</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo -E curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg</span><br></pre></td></tr></table></figure><p>但每次想要通过代理使用sudo时，都需要加上 ‘<strong>-E</strong>‘ 这个参数。</p><h4 id="2-通过visudo编辑sudoers文件，将all-proxy环境变量保留到sudo中"><a href="#2-通过visudo编辑sudoers文件，将all-proxy环境变量保留到sudo中" class="headerlink" title="2. 通过visudo编辑sudoers文件，将all_proxy环境变量保留到sudo中"></a>2. 通过visudo编辑sudoers文件，将all_proxy环境变量保留到sudo中</h4><p>visudo是Linux下专门编辑sudoers文件的工具，因为直接通过vi &#x2F;etc&#x2F;sudoers修改，如果添加的规则有误将会直接导致sudo无法使用。</p><p>通过visudo工具编辑sudoes文件，在保存时会检测并提示错误</p><p>命令行打开visudo后，在编辑器中添加一行<code>Defaults        env_keep += &quot;all_proxy&quot;</code>,如下所示</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#</span><br><span class="line"># This file MUST be edited with the &#x27;visudo&#x27; command as root.</span><br><span class="line">#</span><br><span class="line"># Please consider adding local content in /etc/sudoers.d/ instead of</span><br><span class="line"># directly modifying this file.</span><br><span class="line">#</span><br><span class="line"># See the man page for details on how to write a sudoers file.</span><br><span class="line">#</span><br><span class="line">Defaults        env_reset</span><br><span class="line">Defaults        mail_badpass</span><br><span class="line">Defaults        secure_path=&quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin&quot;</span><br><span class="line">Defaults        use_pty</span><br><span class="line">Defaults        env_keep += &quot;all_proxy&quot;</span><br></pre></td></tr></table></figure><p>使用<code>Ctrl+o</code>回车保存tmp文件，<code>Ctrl+x</code>退出编辑器。</p><p>如果规则无误的话则会自动将sudoers.tmp文件保存为sudoers。</p><p>保存后可以通过<code>sudo cat /etc/sudoers</code>看看是否保存成功。</p><p>再次使用下面命令</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg</span><br></pre></td></tr></table></figure><p>发现已经可以正常使用代理了。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;今日在WSL中安装Ros2的时候发现使用下面命令添加ROS2 GPG key的时候下载失败。&lt;/p&gt;
+&lt;figure class=&quot;high</summary>
+      
+    
+    
+    
+    <category term="其它" scheme="https://www.boundlesslearn.com/categories/%E5%85%B6%E5%AE%83/"/>
+    
+    
+    <category term="Github" scheme="https://www.boundlesslearn.com/tags/Github/"/>
+    
+    <category term="代理" scheme="https://www.boundlesslearn.com/tags/%E4%BB%A3%E7%90%86/"/>
+    
+    <category term="Linux" scheme="https://www.boundlesslearn.com/tags/Linux/"/>
+    
+    <category term="其它" scheme="https://www.boundlesslearn.com/tags/%E5%85%B6%E5%AE%83/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>C++中参数为引用构成的重载</title>
+    <link href="https://www.boundlesslearn.com/posts/660089843/"/>
+    <id>https://www.boundlesslearn.com/posts/660089843/</id>
+    <published>2022-10-22T08:01:57.000Z</published>
+    <updated>2023-06-25T15:22:10.179Z</updated>
+    
+    <content type="html"><![CDATA[<p>今日看侯捷老师的C++课程，里面提到了<code>void imag(const double&amp; im) &#123;&#125;</code>和<code>void imag(const double im) &#123;&#125;</code>具有同样的函数签名，所以不能进行重载，但在我实际测试中，发现编译器是允许通过传入参数是引用或值来构成重载的，遂进行了一些测试并记录一下。</p><p>以下测试环境均为VS2019编译器。</p><h1 id="普通函数通过引用构成重载"><a href="#普通函数通过引用构成重载" class="headerlink" title="普通函数通过引用构成重载"></a>普通函数通过引用构成重载</h1><p>本来从直觉上来说我也是赞同侯捷老师的看法，因为只通过引用区分函数在函数调用的时候会出现二义性，应该不允许该重载操作才对。因此写了下述两个函数：</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">func1</span><span class="params">(<span class="type">int</span>&amp;)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;func(int&amp;)&quot;</span> &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">func1</span><span class="params">(<span class="type">int</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;func(int)&quot;</span> &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>编译发现编译器没有报错，编译器允许了这种重载方式。但是在尝试调用的过程中发现如果传入参数为变量的情况下，编译不通过。</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">func1</span>(<span class="number">0</span>);           <span class="comment">//数字作为参数，调用的是非引用版本，打印func(int);</span></span><br><span class="line">    <span class="comment">//func1(a);           //如果是传入变量，编译器会报错提示“func1”: 对重载函数的调用不明确</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E5%8F%82%E6%95%B0%E4%B8%BA%E5%8F%98%E9%87%8F%E8%B0%83%E7%94%A8%E5%A4%B1%E8%B4%A5.png.webp"></p><p>如果想要调用引用版本的func1，有两种方式</p><h2 id="1-通过函数指针的方式明确调用的函数"><a href="#1-通过函数指针的方式明确调用的函数" class="headerlink" title="1. 通过函数指针的方式明确调用的函数"></a>1. 通过函数指针的方式明确调用的函数</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">void</span> (*p)(<span class="type">int</span>&amp;) = func1;</span><br><span class="line">    <span class="built_in">p</span>(a);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E9%80%9A%E8%BF%87%E5%87%BD%E6%95%B0%E6%8C%87%E9%92%88%E8%B0%83%E7%94%A8.png.webp"></p><h2 id="2-通过static-cast对函数类型进行转换"><a href="#2-通过static-cast对函数类型进行转换" class="headerlink" title="2. 通过static_cast对函数类型进行转换"></a>2. 通过static_cast对函数类型进行转换</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">static_cast</span>&lt;<span class="built_in">void</span>(*)(<span class="type">int</span>&amp;)&gt;(func1)(a);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/static_cast%E5%AF%B9%E5%87%BD%E6%95%B0%E7%B1%BB%E5%9E%8B%E8%BF%9B%E8%A1%8C%E8%BD%AC%E6%8D%A2.png.webp"></p><p>通过这种方式也可以指定调用非引用版本的func1。</p><h1 id="类成员函数通过引用构成重载"><a href="#类成员函数通过引用构成重载" class="headerlink" title="类成员函数通过引用构成重载"></a>类成员函数通过引用构成重载</h1><p>对于类成员函数来说，同样的方法也可以实现调用，不过类成员函数的函数指针写法不一样而已。</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">func1</span><span class="params">(<span class="type">int</span> x)</span></span>&#123; cout &lt;&lt; <span class="string">&quot;with value&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">func1</span><span class="params">(<span class="type">int</span>&amp; x)</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;with reference&quot;</span> &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><p>上述代码编译器同样不会报错，但不能直接传入变量进行调用。</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="type">int</span> a;</span><br><span class="line">    A a1;</span><br><span class="line">    a1.<span class="built_in">func1</span>(<span class="number">1</span>);        <span class="comment">//不报错，打印with value</span></span><br><span class="line">    <span class="comment">//a1.func1(a);        //编译器报错，提示“A::func1”: 对重载函数的调用不明确</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>同样可以通过两种方式对引用版本进行调用</p><h2 id="1-通过函数指针的方式明确调用的类成员函数"><a href="#1-通过函数指针的方式明确调用的类成员函数" class="headerlink" title="1. 通过函数指针的方式明确调用的类成员函数"></a>1. 通过函数指针的方式明确调用的类成员函数</h2><p>不同点在于类成员函数（无static修饰符）的函数指针调用，需要指定具体的调用对象</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="type">int</span> a;</span><br><span class="line">    A a1;</span><br><span class="line">    <span class="built_in">void</span> (A::* p)(<span class="type">int</span>&amp;) = &amp;A::func1;</span><br><span class="line">    (a1.*p)(a);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E7%B1%BB%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0%E5%87%BD%E6%95%B0%E6%8C%87%E9%92%88%E6%96%B9%E5%BC%8F%E8%B0%83%E7%94%A8.png.webp"></p><h2 id="2-通过static-cast对类成员函数类型进行转换"><a href="#2-通过static-cast对类成员函数类型进行转换" class="headerlink" title="2. 通过static_cast对类成员函数类型进行转换"></a>2. 通过static_cast对类成员函数类型进行转换</h2><p>同样需要指定调用的对象</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="type">int</span> a;</span><br><span class="line">    A a1;</span><br><span class="line">    (a1.*<span class="built_in">static_cast</span>&lt;<span class="built_in">void</span>(A::*)(<span class="type">int</span>&amp;)&gt;(&amp;A::func1))(a);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E7%B1%BB%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0static_cast%E6%96%B9%E5%BC%8F.png.webp"></p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;今日看侯捷老师的C++课程，里面提到了&lt;code&gt;void imag(const double&amp;amp; im) &amp;#123;&amp;#125;&lt;/code&gt;和&lt;code&gt;void imag(const double im) &amp;#123;&amp;#125;&lt;/code&gt;具有同样的函数签</summary>
+      
+    
+    
+    
+    <category term="C++" scheme="https://www.boundlesslearn.com/categories/C/"/>
+    
+    
+    <category term="C++" scheme="https://www.boundlesslearn.com/tags/C/"/>
+    
+    <category term="函数重载" scheme="https://www.boundlesslearn.com/tags/%E5%87%BD%E6%95%B0%E9%87%8D%E8%BD%BD/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>重铸奥斯曼帝国荣光，吾辈义不容辞（注册Steam土耳其区账号教程）</title>
+    <link href="https://www.boundlesslearn.com/posts/3158817986/"/>
+    <id>https://www.boundlesslearn.com/posts/3158817986/</id>
+    <published>2022-09-24T11:55:30.000Z</published>
+    <updated>2023-06-25T15:22:10.179Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>  几天前日常打开了小黑盒，看看愿望单里的游戏有没有打折，发现半条命Alxy史地半价。</p><p>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E5%B0%8F%E9%BB%91%E7%9B%92Alxy.jpg.webp"></p><p>  内心一阵小激动，正准备掏出钱包让G胖“Take me monkey”，突然想看看全区价格。</p><p>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E5%B0%8F%E9%BB%91%E7%9B%92%E5%90%84%E5%8C%BA%E4%BB%B7%E6%A0%BC.jpg.webp"><br>  不看不知道，原来阿区和土区这么便宜，以前只听说过这两个区很便宜，没想到价格差这么多。</p><p>  那我们就不能忍了，这不得“精神土耳其人”一波。</p><h2 id="注册账号"><a href="#注册账号" class="headerlink" title="注册账号"></a>注册账号</h2><p>  这里我用土耳其区账号举例，注册阿根廷区账号也是差不多的。</p><p>  想要注册土耳其区的steam账号，首先得拥有一个土耳其区的网络，有能力的可以直接选择土耳其节点魔法上网，没有魔法的就使用加速器即可，主流加速器都有Steam土耳其区的节点。（有的加速器写着是土耳其区，实际连上的是香港，这个也需要大家多尝试几个）</p><p>  我这边是直接使用的魔法，施加好魔法被动后，打开<a href="https://store.steampowered.com/">steam官网</a>，点击左上角的登录。</p><p>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/Steam%E7%99%BB%E5%BD%95%E9%A1%B5.png.webp"></p><p>  在登录页面下方找到加入steam并点击。此时会进入到注册页面，如果你的网络正常连接到土耳其的情况下，居住国家&#x2F;地区该栏就应该显示为土耳其。</p><p>  如果显示的是其它国家，请更换别的节点或者加速器，按上述步骤重新打开该页面，看看地区是否显示位土耳其。</p><p>  <strong><font size=4><i class="fas fa-exclamation-triangle"></i> 不要手动更改，手动更改没有用 </font></strong></p><p>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/Steam%E6%B3%A8%E5%86%8C%E9%A1%B5.png.webp"></p><p>  地区正常显示为土耳其的话，就可以使用自己的电子邮箱注册一下，国内国外理论上都可以，为了多一分保险我选择的是gmail邮箱。</p><p>  接着点击进行人机验证验证通过，勾选上用户协议点击继续就可以了</p><blockquote><p>在这个位置使用加速器方式连接的朋友可能会遇到创建失败的提示<br>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E5%88%9B%E5%BB%BA%E9%94%99%E8%AF%AF.png.webp"><br>  遇到这种情况，就先把加速器断开（不要关闭，一会儿还要用）。再进行人机验证即可。</p></blockquote><p>  点击继续后，来到了创建账户的页面，正常输入用户名和密码注册即可，</p><p>  <strong><center><font size=4><i class="fas fa-exclamation-triangle"></i> 如果前面将加速器断开了的话，请记得连接回加速器！<i class="fas fa-exclamation-triangle"></i></font></center></strong></p><p>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E5%88%9B%E5%BB%BA%E8%B4%A6%E6%88%B7.png.webp"></p><p>  如果一切正常的话，点击完成后我们就用了了一个土耳其区的账号。</p><p>  那么如何验证我们刚创建的账号是不是真的注册成功了呢？</p><p>  我们使用刚才的账号登录steam，在右上角点击你的账户名，菜单中选择账户明细，打开我们的账户明细</p><p>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E8%B4%A6%E6%88%B7%E8%8F%9C%E5%8D%95.png.webp"></p><p>  如果账户明细中，你的钱包余额单位是TL，并且国家&#x2F;地区是土耳其的话，那么恭喜你，你成功创建了一个土区的账号。<br>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E6%98%8E%E7%BB%86.png.webp"><br>  你还可以添加几个免费的游戏到库中，然后再看看国家和地区是否变回中国。</p><p>  下一步就是淘宝找充值卡或礼品卡进行充值购买游戏啦。</p><h2 id="绑定令牌"><a href="#绑定令牌" class="headerlink" title="绑定令牌"></a>绑定令牌</h2><p>  刚注册完土区账号，建议先把手机令牌给绑上，因为开通市场需要消费5美元以及手机令牌绑定14天。</p><p>  所以以后有挂余额的需求的话，建议第一步就是绑定手机令牌。</p><p>  首先我们再账户明细页面，找到账户安全项里，点击管理Steam令牌。</p><p>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E6%B7%BB%E5%8A%A0%E4%BB%A4%E7%89%8C.png.webp"></p><p>  点击从我手机中的Steam应用获取Steam令牌验证码<br>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E4%BB%A4%E7%89%8C.png.webp"></p><p>  按照页面提示下载安装Steam手机App，或者去应用市场下载也可以。</p><p>  下载安装完成后，登录手机Steam App，连接不上的可能需要加速器或魔法。</p><p>  点击左上菜单，在菜单中选择Steam令牌</p><p>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E6%89%8B%E6%9C%BASteam%E8%8F%9C%E5%8D%95.jpg.webp"></p><p>  点击添加验证器</p><p>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E6%B7%BB%E5%8A%A0%E9%AA%8C%E8%AF%81%E5%99%A8.png.webp"></p><p>  接着会让我们输入手机号，因为我们地区是土耳其，所以我们需要手动把区号改为+86</p><p>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E6%89%8B%E6%9C%BASteam%E8%BE%93%E5%85%A5%E9%AA%8C%E8%AF%81%E7%A0%81.jpg.webp"></p><p>  点击添加后Steam会向我们的注册邮箱发送一封邮件。</p><p>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E6%B7%BB%E5%8A%A0%E6%89%8B%E6%9C%BA.png.webp"></p><p>  点击添加手机号码后即可返回APP，输入给我们手机发送的短信代码</p><p>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E6%89%8B%E6%9C%BA%E8%BE%93%E5%85%A5%E9%AA%8C%E8%AF%81%E7%A0%81.jpg.webp"></p><p>  最后记录用于手机丢失后重设验证器的救援代码即可完成令牌的绑定。</p><p>  令牌绑定成功后，我们点击我们的账户详情页可以看到账户安全栏已经变为了受Steam令牌手机验证器保护中。</p><p>  <img src="https://gcore.jsdelivr.net/gh/BoundlessLearning/PicHost@Webp/Img/%E6%B7%BB%E5%8A%A0%E4%BB%A4%E7%89%8C%E6%88%90%E5%8A%9F.png.webp"></p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;  几天前日常打开了小黑盒，看看愿望单里的游戏有没有打折，发现半条命Alxy史地半价。&lt;/p&gt;
+&lt;p&gt;  &lt;img src=&quot;https:/</summary>
+      
+    
+    
+    
+    <category term="其它" scheme="https://www.boundlesslearn.com/categories/%E5%85%B6%E5%AE%83/"/>
+    
+    
+    <category term="其它" scheme="https://www.boundlesslearn.com/tags/%E5%85%B6%E5%AE%83/"/>
+    
+    <category term="Steam" scheme="https://www.boundlesslearn.com/tags/Steam/"/>
+    
+  </entry>
+  
+</feed>
